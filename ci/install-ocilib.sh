@@ -1,6 +1,7 @@
 #!/bin/sh
 set -ex
 
+cd /tmp
 wget https://github.com/vrogier/ocilib/archive/v4.2.1.tar.gz
 tar xvf v4.2.1.tar.gz
 cd /tmp/ocilib-4.2.1
