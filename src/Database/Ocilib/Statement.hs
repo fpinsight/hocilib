@@ -54,6 +54,7 @@ import           Foreign.Ptr
 import qualified Language.C.Inline as C
 import           Database.Ocilib.Oci
 import           Database.Ocilib.Enums
+import           Database.Ocilib.Internal
 
 C.context (C.baseCtx <> C.funCtx <> ociCtx)
 
@@ -62,8 +63,8 @@ C.include "<ocilib.h>"
 -- Executing Statements
 
 -- | Create a statement object and return its handle.
-ociStatementCreate :: Ptr OCI_Connection -> IO (Ptr OCI_Statement)
-ociStatementCreate c = [C.exp| OCI_Statement* { OCI_StatementCreate($(OCI_Connection *c)) } |]
+ociStatementCreate :: Ptr OCI_Connection -> IO (Maybe (Ptr OCI_Statement))
+ociStatementCreate c = fmap toMaybePtr [C.exp| OCI_Statement* { OCI_StatementCreate($(OCI_Connection *c)) } |]
 
 -- | Free a statement and all resources associated to it (resultsets ...)
 ociStatementFree :: Ptr OCI_Statement -> IO Bool

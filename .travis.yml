@@ -28,19 +28,11 @@ install:
 - ci/install-instantclient.sh
 - ci/install-ocilib.sh
 
-#before_script:
-#- docker --version
-#- docker pull alexeiled/docker-oracle-xe-11g
-#- docker run -d --name oracle -p 1521:1521 -v $(pwd)/sql:/etc/entrypoint-initdb.d alexeiled/docker-oracle-xe-11g
-
-
 # This line does all of the work: installs GHC if necessary, build the library,
 # executables, and test suites, and runs the test suites. --no-terminal works
 # around some quirks in Travis's terminal implementation.
 script:
-- stack --no-terminal --install-ghc build --test --no-run-tests
-- LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH .stack-work/dist/x86_64-linux/Cabal-1.22.5.0/build/test/test
-- cat /etc/ld.so.conf
+- stack --no-terminal --install-ghc build --test
 
 # Caching so the next build will be fast too.
 cache:

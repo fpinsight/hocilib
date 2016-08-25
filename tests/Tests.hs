@@ -35,7 +35,7 @@ fetchTest = do
     case maybeC of
         Nothing -> assertFailure "failed to create connection"
         Just c -> do
-            st <- ociStatementCreate c
+            Just st <- ociStatementCreate c
             b <- ociExecuteStmt st "select * from test_fetch"
             assertBool "ociExecuteStatement" b
 
@@ -113,7 +113,7 @@ testStringBinding = do
     case maybeC of
         Nothing -> assertFailure "unable to connect"
         Just c -> do
-            st <- ociStatementCreate c
+            Just st <- ociStatementCreate c
             ociSetBindAllocation st OCI_BAM_INTERNAL
             b <- ociPrepare st "select * from test_fetch where article=(:article)"
             assertBool "prepared" b

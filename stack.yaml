@@ -1,4 +1,4 @@
-resolver: lts-6.12
+resolver: lts-6.13
 packages:
 - '.'
 extra-deps: []
@@ -6,3 +6,6 @@ flags: {}
 extra-package-dbs: []
 extra-include-dirs: []
 extra-lib-dirs: []
+docker:
+  enable: false
+  repo: mystack:latest
