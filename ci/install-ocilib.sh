@@ -9,7 +9,7 @@ cd /tmp/ocilib-4.2.1
 ./configure --with-oracle-import=linkage \
             --with-oracle-charset=ansi \
             --with-oracle-headers-path=/usr/include/oracle/12.1/client64 \
-            --with-oracle-lib-path=/usr/lib/oracle/12.1/client64/lib \
+            --with-oracle-lib-path=/usr/lib/oracle/12.1/client64/lib
 make
 sudo make install
 cd
