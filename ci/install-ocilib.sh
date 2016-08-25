@@ -13,5 +13,5 @@ make
 sudo make install
 cd
 rm -rf /tmp/ocilib-4.2.1
-sudo echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/usr-local.conf
 sudo ldconfig
