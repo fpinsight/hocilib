@@ -3,6 +3,8 @@
 hocilib is a FFI binding of [ocilib](http://www.ocilib.net) for haskell.
 
 [![build status](https://travis-ci.org/fpinsight/hocilib.svg?branch=master)](https://travis-ci.org/fpinsight/hocilib)
+[![hocilib on Stackage LTS](http://stackage.org/package/hocilib/badge/lts)](http://stackage.org/lts/package/hocilib)
+[![hocilib on Stackage Nightly](http://stackage.org/package/hocilib/badge/nightly)](http://stackage.org/nightly/package/hocilib)
 
 # Join in!
 
