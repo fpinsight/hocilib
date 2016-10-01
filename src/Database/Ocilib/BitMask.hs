@@ -1,4 +1,5 @@
 {-# LANGUAGE DefaultSignatures #-}
+{-# OPTIONS_HADDOCK hide, prune, ignore-exports #-}
 
 -- |
 -- Module:      Database.Ocilib.BitMask
