@@ -89,9 +89,9 @@ module Database.Ocilib.Fetch
     , ociGetDataLength
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
@@ -152,24 +152,24 @@ ociGetColumn :: Ptr OCI_Resultset -> CUInt -> IO (Ptr OCI_Column)
 ociGetColumn rs i = [C.exp| OCI_Column* { OCI_GetColumn($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the column object handle from its name in the resultset.
-ociGetColumn2 :: Ptr OCI_Resultset -> String -> IO (Ptr OCI_Column)
+ociGetColumn2 :: Ptr OCI_Resultset -> ByteString -> IO (Ptr OCI_Column)
 ociGetColumn2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| OCI_Column* { OCI_GetColumn2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
 -- | Return the index of the column in the result from its name.
-ociGetColumnIndex :: Ptr OCI_Resultset -> String -> IO CUInt
+ociGetColumnIndex :: Ptr OCI_Resultset -> ByteString -> IO CUInt
 ociGetColumnIndex rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| unsigned int { OCI_GetColumnIndex($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
 -- | Return the name of the given column.
-ociColumnGetName :: Ptr OCI_Column -> IO String
+ociColumnGetName :: Ptr OCI_Column -> IO ByteString
 ociColumnGetName c = do
     s <- [C.exp| const char* { OCI_ColumnGetName($(OCI_Column *c)) } |]
-    peekCString s
+    packCString s
 
 -- | Return the type of the given column.
 ociColumnGetType :: Ptr OCI_Column -> IO ColumnType
@@ -183,10 +183,10 @@ ociColumnGetType c = do
 -}
 
 -- | Return the Oracle SQL type name of the column data type.
-ociColumnGetSQLType :: Ptr OCI_Column -> IO String
+ociColumnGetSQLType :: Ptr OCI_Column -> IO ByteString
 ociColumnGetSQLType c = do
     s <- [C.exp| const char* { OCI_ColumnGetSQLType($(OCI_Column *c)) } |]
-    peekCString s
+    packCString s
 
 {-
 -- | Return the Oracle SQL Full name including precision and size of the column data type.
@@ -238,9 +238,9 @@ ociSetStructNumericType :: Ptr OCI_Resultset -> CUInt -> CUInt -> IO Bool -- FIX
 ociSetStructNumericType rs i t = fmap toBool [C.exp| int { OCI_SetStructNumericType($(OCI_Resultset *rs), $(unsigned int i), $(unsigned int t)) } |]
 
 -- | set the numeric data type of the given structure member (identified from column name in the resultset) to retrieve when calling OCI_GetStruct()
-ociSetStructNumericType2 :: Ptr OCI_Resultset -> String -> CUInt -> IO Bool -- FIXME use enum for the type
+ociSetStructNumericType2 :: Ptr OCI_Resultset -> ByteString -> CUInt -> IO Bool -- FIXME use enum for the type
 ociSetStructNumericType2 rs name t =
-    withCString name (\n ->
+    useAsCString name (\n ->
         fmap toBool [C.exp| int { OCI_SetStructNumericType2($(OCI_Resultset *rs), $(char *n), $(unsigned int t))} |]
     )
 
@@ -254,9 +254,9 @@ ociGetShort :: Ptr OCI_Resultset -> CUInt -> IO CShort
 ociGetShort rs i = [C.exp| short { OCI_GetShort($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current short value of the column from its name in the resultset.
-ociGetShort2 :: Ptr OCI_Resultset -> String -> IO CShort
+ociGetShort2 :: Ptr OCI_Resultset -> ByteString -> IO CShort
 ociGetShort2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| short { OCI_GetShort2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -265,9 +265,9 @@ ociGetUnsignedShort :: Ptr OCI_Resultset -> CUInt -> IO CUShort
 ociGetUnsignedShort rs i = [C.exp| unsigned short { OCI_GetUnsignedShort($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current unsigned short value of the column from its name in the resultset.
-ociGetUnsignedShort2 :: Ptr OCI_Resultset -> String -> IO CUShort
+ociGetUnsignedShort2 :: Ptr OCI_Resultset -> ByteString -> IO CUShort
 ociGetUnsignedShort2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| unsigned short { OCI_GetUnsignedShort2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -276,9 +276,9 @@ ociGetInt :: Ptr OCI_Resultset -> CUInt -> IO CInt
 ociGetInt rs i = [C.exp| int { OCI_GetInt($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current integer value of the column from its name in the resultset.
-ociGetInt2 :: Ptr OCI_Resultset -> String -> IO CInt
+ociGetInt2 :: Ptr OCI_Resultset -> ByteString -> IO CInt
 ociGetInt2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| int { OCI_GetInt2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -287,9 +287,9 @@ ociGetUnsignedInt :: Ptr OCI_Resultset -> CUInt -> IO CUInt
 ociGetUnsignedInt rs i = [C.exp| unsigned int { OCI_GetUnsignedInt($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current unsigned integer value of the column from its name in the resultset.
-ociGetUnsignedInt2 :: Ptr OCI_Resultset -> String -> IO CUInt
+ociGetUnsignedInt2 :: Ptr OCI_Resultset -> ByteString -> IO CUInt
 ociGetUnsignedInt2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| unsigned int { OCI_GetUnsignedInt2($(OCI_Resultset *rs), $(char *n))} |]
     )
 
@@ -309,17 +309,17 @@ ociGetUnsignedInt2 rs name =
 -}
 
 -- | Return the current string value of the column at the given index in the resultset.
-ociGetString :: Ptr OCI_Resultset -> CUInt -> IO String
+ociGetString :: Ptr OCI_Resultset -> CUInt -> IO ByteString
 ociGetString rs i = do
     s <- [C.exp| const char* { OCI_GetString($(OCI_Resultset *rs), $(unsigned int i)) }|]
-    peekCString s -- FIXME release CString ?
+    packCString s -- FIXME release CString ?
 
 -- | Return the current string value of the column from its name in the resultset.
-ociGetString2 :: Ptr OCI_Resultset -> String -> IO String
+ociGetString2 :: Ptr OCI_Resultset -> ByteString -> IO ByteString
 ociGetString2 rs name =
-    withCString name (\n -> do
+    useAsCString name (\n -> do
         s <- [C.exp| const char* { OCI_GetString2($(OCI_Resultset *rs), $(char *n)) } |]
-        peekCString s
+        packCString s
     )
 
 {-
@@ -335,9 +335,9 @@ ociGetDouble :: Ptr OCI_Resultset -> CUInt -> IO CDouble
 ociGetDouble rs i = [C.exp| double { OCI_GetDouble($(OCI_Resultset *rs), $(unsigned int i))} |]
 
 -- | Return the current double value of the column from its name in the resultset.
-ociGetDouble2 :: Ptr OCI_Resultset -> String -> IO CDouble
+ociGetDouble2 :: Ptr OCI_Resultset -> ByteString -> IO CDouble
 ociGetDouble2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| double { OCI_GetDouble2($(OCI_Resultset *rs), $(char *n))} |]
     )
 
@@ -346,9 +346,9 @@ ociGetFloat :: Ptr OCI_Resultset -> CUInt -> IO CFloat
 ociGetFloat rs i = [C.exp| float { OCI_GetFloat($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current float value of the column from its name in the resultset.
-ociGetFloat2 :: Ptr OCI_Resultset -> String -> IO CFloat
+ociGetFloat2 :: Ptr OCI_Resultset -> ByteString -> IO CFloat
 ociGetFloat2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| float { OCI_GetFloat2($(OCI_Resultset *rs), $(char *n))} |]
     )
 
@@ -357,9 +357,9 @@ ociGetDate :: Ptr OCI_Resultset -> CUInt -> IO (Ptr OCI_Date)
 ociGetDate rs i = [C.exp| OCI_Date* { OCI_GetDate($(OCI_Resultset *rs), $(unsigned int i))} |]
 
 -- | Return the current date value of the column from its name in the resultset.
-ociGetDate2 :: Ptr OCI_Resultset -> String -> IO (Ptr OCI_Date)
+ociGetDate2 :: Ptr OCI_Resultset -> ByteString -> IO (Ptr OCI_Date)
 ociGetDate2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| OCI_Date* { OCI_GetDate2($(OCI_Resultset *rs), $(char *n))} |]
     )
 
@@ -368,9 +368,9 @@ ociGetTimestamp :: Ptr OCI_Resultset -> CUInt -> IO (Ptr OCI_Timestamp)
 ociGetTimestamp rs i = [C.exp| OCI_Timestamp* { OCI_GetTimestamp($(OCI_Resultset *rs), $(unsigned int i)) } |]
 
 -- | Return the current timestamp value of the column from its name in the resultset.
-ociGetTimestamp2 :: Ptr OCI_Resultset -> String -> IO (Ptr OCI_Timestamp)
+ociGetTimestamp2 :: Ptr OCI_Resultset -> ByteString -> IO (Ptr OCI_Timestamp)
 ociGetTimestamp2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| OCI_Timestamp* { OCI_GetTimestamp2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -379,9 +379,9 @@ ociGetInterval :: Ptr OCI_Resultset -> CUInt -> IO (Ptr OCI_Interval)
 ociGetInterval rs i = [C.exp| OCI_Interval* { OCI_GetInterval($(OCI_Resultset *rs), $(unsigned int i))  } |]
 
 -- | Return the current interval value of the column from its name in the resultset.
-ociGetInterval2 :: Ptr OCI_Resultset -> String -> IO (Ptr OCI_Interval)
+ociGetInterval2 :: Ptr OCI_Resultset -> ByteString -> IO (Ptr OCI_Interval)
 ociGetInterval2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| OCI_Interval* { OCI_GetInterval2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -390,9 +390,9 @@ ociGetStatement :: Ptr OCI_Resultset -> CUInt -> IO (Ptr OCI_Statement)
 ociGetStatement rs i = [C.exp| OCI_Statement* { OCI_GetStatement($(OCI_Resultset *rs), $(unsigned int i)) }|]
 
 -- | Return the current cursor value of the column from its name in the resultset.
-ociGetStatement2 :: Ptr OCI_Resultset -> String -> IO (Ptr OCI_Statement)
+ociGetStatement2 :: Ptr OCI_Resultset -> ByteString -> IO (Ptr OCI_Statement)
 ociGetStatement2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         [C.exp| OCI_Statement* { OCI_GetStatement2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 
@@ -441,9 +441,9 @@ ociIsNull rs i = fmap toBool [C.exp| int { OCI_IsNull($(OCI_Resultset *rs), $(un
 
 -- | Check if the current row value is null for the column of the given name in the resultset.
 -- boolean OCI_IsNull2 (OCI_Resultset *rs, const otext *name)
-ociIsNull2 :: Ptr OCI_Resultset -> String -> IO Bool
+ociIsNull2 :: Ptr OCI_Resultset -> ByteString -> IO Bool
 ociIsNull2 rs name =
-    withCString name (\n ->
+    useAsCString name (\n ->
         fmap toBool [C.exp| int { OCI_IsNull2($(OCI_Resultset *rs), $(char *n)) } |]
     )
 

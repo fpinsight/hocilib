@@ -15,9 +15,9 @@
 
 module Database.Ocilib.Schemas where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
@@ -32,10 +32,10 @@ C.include "<ocilib.h>"
 -- Describing Schema Meta data and Objects
 
 -- | Retrieve the available type info information.
-ociTypeInfoGet :: Ptr OCI_Connection -> String -> TypeInfoType -> IO (Maybe (Ptr OCI_TypeInfo))
+ociTypeInfoGet :: Ptr OCI_Connection -> ByteString -> TypeInfoType -> IO (Maybe (Ptr OCI_TypeInfo))
 ociTypeInfoGet c name typ = do
     let typ' = fromIntegral $ fromEnum typ
-    withCString name (\name' ->
+    useAsCString name (\name' ->
             fmap toMaybePtr [C.exp| OCI_TypeInfo* { OCI_TypeInfoGet($(OCI_Connection *c), $(char *name'), $(unsigned int typ')) } |]
         )
 
@@ -60,7 +60,7 @@ ociTypeInfoGetColumn :: Ptr OCI_TypeInfo -> CUInt -> IO (Ptr OCI_Column)
 ociTypeInfoGetColumn t i = [C.exp| OCI_Column* { OCI_TypeInfoGetColumn($(OCI_TypeInfo *t), $(unsigned int i))} |]
 
 -- | Return the name described by the type info object.
-ociTypeInfoGetName :: Ptr OCI_TypeInfo -> IO String
+ociTypeInfoGetName :: Ptr OCI_TypeInfo -> IO ByteString
 ociTypeInfoGetName t = do
     s <- [C.exp| const char* { OCI_TypeInfoGetName($(OCI_TypeInfo *t)) } |]
-    peekCString s
+    packCString s

@@ -24,9 +24,9 @@ module Database.Ocilib.Errors
     , ociErrorGetRow
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
 import           Database.Ocilib.Oci
@@ -44,10 +44,10 @@ ociGetLastError :: IO (Maybe (Ptr OCI_Error))
 ociGetLastError = fmap toMaybePtr [C.exp| OCI_Error* { OCI_GetLastError() } |]
 
 -- | Retrieve error message from error handle.
-ociErrorGetString :: Ptr OCI_Error -> IO String
+ociErrorGetString :: Ptr OCI_Error -> IO ByteString
 ociErrorGetString err = do
     s <- [C.exp| const char* { OCI_ErrorGetString($(OCI_Error *err)) } |]
-    peekCString s
+    packCString s
 
 -- | Retrieve the type of error from error handle.
 ociErrorGetType :: Ptr OCI_Error -> IO ErrorType

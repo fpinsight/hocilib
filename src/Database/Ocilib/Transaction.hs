@@ -16,13 +16,10 @@
 module Database.Ocilib.Transaction where
 
 import           Data.Monoid ((<>))
--- import           Foreign.C.Types
--- import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
 import           Database.Ocilib.Oci
--- import           Database.Ocilib.Enums
 
 C.context (C.baseCtx <> C.funCtx <> ociCtx)
 

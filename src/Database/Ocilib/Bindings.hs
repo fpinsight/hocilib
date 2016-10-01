@@ -84,6 +84,7 @@ module Database.Ocilib.Bindings
     , ociBindSetCharsetForm
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
 import           Foreign.C.String
@@ -121,20 +122,20 @@ ociIsRebindingAllowed st =
     fmap toBool [C.exp| int { OCI_IsRebindingAllowed($(OCI_Statement *st)) } |]
 
 -- | Bind a boolean variable (PL/SQL ONLY)
-ociBindBoolean :: Ptr OCI_Statement -> String -> Ptr CInt -> IO Bool
-ociBindBoolean st n d = withCString n (\n' ->
+ociBindBoolean :: Ptr OCI_Statement -> ByteString -> Ptr CInt -> IO Bool
+ociBindBoolean st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindBoolean($(OCI_Statement *st), $(const char *n'), $(int *d)) } |]
     )
 
 -- | Bind an short variable.
-ociBindShort :: Ptr OCI_Statement -> String -> Ptr CShort -> IO Bool
-ociBindShort st n d = withCString n (\n' ->
+ociBindShort :: Ptr OCI_Statement -> ByteString -> Ptr CShort -> IO Bool
+ociBindShort st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindShort($(OCI_Statement *st), $(const char *n'), $(short *d)) } |]
     )
 
 -- | Bind an array of shorts.
-ociBindArrayOfShorts :: Ptr OCI_Statement -> String -> Ptr CShort -> CUInt -> IO Bool
-ociBindArrayOfShorts st n d nb = withCString n (\n' ->
+ociBindArrayOfShorts :: Ptr OCI_Statement -> ByteString -> Ptr CShort -> CUInt -> IO Bool
+ociBindArrayOfShorts st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfShorts($(OCI_Statement *st)
                                                       , $(const char *n')
                                                       , $(short *d)
@@ -142,16 +143,16 @@ ociBindArrayOfShorts st n d nb = withCString n (\n' ->
     )
 
 -- | Bind an unsigned short variable.
-ociBindUnsignedShort :: Ptr OCI_Statement -> String -> Ptr CUShort -> IO Bool
-ociBindUnsignedShort st n d = withCString n (\n' ->
+ociBindUnsignedShort :: Ptr OCI_Statement -> ByteString -> Ptr CUShort -> IO Bool
+ociBindUnsignedShort st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindUnsignedShort($(OCI_Statement *st)
                                                       , $(const char *n')
                                                       , $(unsigned short *d)) } |]
     )
 
 -- | Bind an array of unsigned shorts.
-ociBindArrayOfUnsignedShorts :: Ptr OCI_Statement -> String -> Ptr CUShort -> CUInt -> IO Bool
-ociBindArrayOfUnsignedShorts st n d nb = withCString n (\n' ->
+ociBindArrayOfUnsignedShorts :: Ptr OCI_Statement -> ByteString -> Ptr CUShort -> CUInt -> IO Bool
+ociBindArrayOfUnsignedShorts st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfUnsignedShorts($(OCI_Statement * st)
                                                               , $(const char *n')
                                                               , $(unsigned short *d)
@@ -159,16 +160,16 @@ ociBindArrayOfUnsignedShorts st n d nb = withCString n (\n' ->
     )
 
 -- | Bind an integer variable.
-ociBindInt :: Ptr OCI_Statement -> String -> Ptr CInt -> IO Bool
-ociBindInt st n d = withCString n (\n' ->
+ociBindInt :: Ptr OCI_Statement -> ByteString -> Ptr CInt -> IO Bool
+ociBindInt st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindInt($(OCI_Statement *st)
                                             , $(const char *n')
                                             , $(int *d)) } |]
     )
 
 -- | Bind an array of integers.
-ociBindArrayOfInts :: Ptr OCI_Statement -> String -> Ptr CInt -> CUInt -> IO Bool
-ociBindArrayOfInts st n d nb = withCString n (\n' ->
+ociBindArrayOfInts :: Ptr OCI_Statement -> ByteString -> Ptr CInt -> CUInt -> IO Bool
+ociBindArrayOfInts st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfInts($(OCI_Statement *st)
                                                     , $(const char *n')
                                                     , $(int *d)
@@ -176,16 +177,16 @@ ociBindArrayOfInts st n d nb = withCString n (\n' ->
     )
 
 -- | Bind an unsigned integer variable.
-ociBindUnsignedInt :: Ptr OCI_Statement -> String -> Ptr CUInt -> IO Bool
-ociBindUnsignedInt st n d = withCString n (\n' ->
+ociBindUnsignedInt :: Ptr OCI_Statement -> ByteString -> Ptr CUInt -> IO Bool
+ociBindUnsignedInt st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindUnsignedInt($(OCI_Statement *st)
                                                     , $(const char* n')
                                                     , $(unsigned int *d)) } |]
     )
 
 -- | Bind an array of unsigned integers.
-ociBindArrayOfUnsignedInts :: Ptr OCI_Statement -> String -> Ptr CUInt -> CUInt -> IO Bool
-ociBindArrayOfUnsignedInts st n d nb = withCString n (\n' ->
+ociBindArrayOfUnsignedInts :: Ptr OCI_Statement -> ByteString -> Ptr CUInt -> CUInt -> IO Bool
+ociBindArrayOfUnsignedInts st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfUnsignedInts($(OCI_Statement *st)
                                                             , $(const char *n')
                                                             , $(unsigned int *d)
@@ -194,8 +195,8 @@ ociBindArrayOfUnsignedInts st n d nb = withCString n (\n' ->
 {-
 -- | Bind a big integer variable.
 -- boolean OCI_BindBigInt (OCI_Statement *stmt, const otext *name, big_int *data)
-ociBindBigInt :: Ptr OCI_Statement -> String -> Ptr Big_Int -> IO Bool
-ociBindBigInt st n d = withCString n (\n' ->
+ociBindBigInt :: Ptr OCI_Statement -> ByteString -> Ptr Big_Int -> IO Bool
+ociBindBigInt st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindBigInt($(OCI_Statement *st)
                                                , $(const char *n')
                                                , $(Big_Int  *d)) } |]
@@ -212,9 +213,9 @@ ociBindBigInt st n d = withCString n (\n' ->
 -}
 
 -- | Bind a string variable.
-ociBindString :: Ptr OCI_Statement -> String -> CString -> CUInt -> IO Bool
+ociBindString :: Ptr OCI_Statement -> ByteString -> CString -> CUInt -> IO Bool
 ociBindString st name d l =
-    withCString name (\n ->
+    useAsCString name (\n ->
         fmap toBool [C.exp| int { OCI_BindString($(OCI_Statement *st)
                                                , $(char *n)
                                                , $(char *d)
@@ -222,9 +223,9 @@ ociBindString st name d l =
     )
 
 -- | Bind an array of strings.
-ociBindArrayOfStrings :: Ptr OCI_Statement -> String -> CString -> CUInt -> CUInt -> IO Bool
+ociBindArrayOfStrings :: Ptr OCI_Statement -> ByteString -> CString -> CUInt -> CUInt -> IO Bool
 ociBindArrayOfStrings st name d len nbElem =
-    withCString name (\n ->
+    useAsCString name (\n ->
         fmap toBool [C.exp| int { OCI_BindArrayOfStrings($(OCI_Statement *st)
                                                        , $(char *n)
                                                        , $(char *d)
@@ -240,16 +241,16 @@ ociBindArrayOfStrings st name d len nbElem =
 -- boolean OCI_BindArrayOfRaws (OCI_Statement *stmt, const otext *name, void *data, unsigned int len, unsigned int nbelem)
 
 -- | Bind a double variable.
-ociBindDouble :: Ptr OCI_Statement -> String -> Ptr CDouble -> IO Bool
-ociBindDouble st n d = withCString n (\n' ->
+ociBindDouble :: Ptr OCI_Statement -> ByteString -> Ptr CDouble -> IO Bool
+ociBindDouble st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindDouble($(OCI_Statement *st)
                                                , $(const char *n')
                                                , $(double *d)) } |]
     )
 
 -- | Bind an array of doubles.
-ociBindArrayOfDoubles :: Ptr OCI_Statement -> String -> Ptr CDouble -> CUInt -> IO Bool
-ociBindArrayOfDoubles st n d nb = withCString n (\n' ->
+ociBindArrayOfDoubles :: Ptr OCI_Statement -> ByteString -> Ptr CDouble -> CUInt -> IO Bool
+ociBindArrayOfDoubles st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfDoubles($(OCI_Statement *st)
                                                        , $(const char *n')
                                                        , $(double *d)
@@ -257,23 +258,23 @@ ociBindArrayOfDoubles st n d nb = withCString n (\n' ->
     )
 
 -- | Bind a float variable.
-ociBindFloat :: Ptr OCI_Statement -> String -> Ptr CFloat -> IO Bool
-ociBindFloat st n d = withCString n (\n' ->
+ociBindFloat :: Ptr OCI_Statement -> ByteString -> Ptr CFloat -> IO Bool
+ociBindFloat st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindFloat($(OCI_Statement *st)
                                               , $(const char *n')
                                               , $(float *d)) } |]
     )
 -- | Bind an array of floats.
-ociBindArrayOfFloats :: Ptr OCI_Statement -> String -> Ptr CFloat -> CUInt -> IO Bool
-ociBindArrayOfFloats st n d nb = withCString n (\n' ->
+ociBindArrayOfFloats :: Ptr OCI_Statement -> ByteString -> Ptr CFloat -> CUInt -> IO Bool
+ociBindArrayOfFloats st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfFloats($(OCI_Statement *st)
                                                       , $(const char *n')
                                                       , $(float *d)
                                                       , $(unsigned int nb)) } |]
     )
 -- | Bind a date variable.
-ociBindDate :: Ptr OCI_Statement -> String -> Ptr OCI_Date -> IO Bool
-ociBindDate st n d = withCString n (\n' ->
+ociBindDate :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Date -> IO Bool
+ociBindDate st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindDate($(OCI_Statement *st)
                                              , $(const char* n')
                                              , $(OCI_Date *d)) } |]
@@ -282,8 +283,8 @@ ociBindDate st n d = withCString n (\n' ->
 -- | Bind an array of dates.
 -- boolean OCI_BindArrayOfDates (OCI_Statement *stmt, const otext *name, OCI_Date **data, unsigned int nbelem)
 {-
-ociBindArrayOfDates :: Ptr OCI_Statement -> String -> Ptr OCI_Date -> CUInt -> IO Bool
-ociBindArrayOfDates st n d nb = withCString n (\n' ->
+ociBindArrayOfDates :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Date -> CUInt -> IO Bool
+ociBindArrayOfDates st n d nb = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindArrayOfDates($(OCI_Statement *st)
                                                      , $(const char *n')
                                                      , $(OCI_Date *d)
@@ -292,8 +293,8 @@ ociBindArrayOfDates st n d nb = withCString n (\n' ->
 -}
 
 -- | Bind a timestamp variable.
-ociBindTimestamp :: Ptr OCI_Statement -> String -> Ptr OCI_Timestamp -> IO Bool
-ociBindTimestamp st n d = withCString n (\n' ->
+ociBindTimestamp :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Timestamp -> IO Bool
+ociBindTimestamp st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindTimestamp($(OCI_Statement *st)
                                                   , $(const char *n')
                                                   , $(OCI_Timestamp *d)) } |]
@@ -303,8 +304,8 @@ ociBindTimestamp st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfTimestamps (OCI_Statement *stmt, const otext *name, OCI_Timestamp **data, unsigned int type, unsigned int nbelem)
 
 -- | Bind an interval variable.
-ociBindInterval :: Ptr OCI_Statement -> String -> Ptr OCI_Interval -> IO Bool
-ociBindInterval st n d = withCString n (\n' ->
+ociBindInterval :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Interval -> IO Bool
+ociBindInterval st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindInterval($(OCI_Statement *st)
                                                  , $(const char *n')
                                                  , $(OCI_Interval *d)) } |]
@@ -313,8 +314,8 @@ ociBindInterval st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfIntervals (OCI_Statement *stmt, const otext *name, OCI_Interval **data, unsigned int type, unsigned int nbelem)
 
 -- | Bind a Lob variable.
-ociBindLob :: Ptr OCI_Statement -> String -> Ptr OCI_Lob -> IO Bool
-ociBindLob st n d = withCString n (\n' ->
+ociBindLob :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Lob -> IO Bool
+ociBindLob st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindLob($(OCI_Statement *st)
                                             , $(const char *n')
                                             , $(OCI_Lob *d)) } |]
@@ -324,8 +325,8 @@ ociBindLob st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfLobs (OCI_Statement *stmt, const otext *name, OCI_Lob **data, unsigned int type, unsigned int nbelem)
 
 -- | Bind a File variable.
-ociBindFile :: Ptr OCI_Statement -> String -> Ptr OCI_File -> IO Bool
-ociBindFile st n d = withCString n (\n' ->
+ociBindFile :: Ptr OCI_Statement -> ByteString -> Ptr OCI_File -> IO Bool
+ociBindFile st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindFile($(OCI_Statement *st)
                                              , $(const char *n')
                                              , $(OCI_File *d)) } |]
@@ -344,8 +345,8 @@ ociBindObject st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfObjects (OCI_Statement *stmt, const otext *name, OCI_Object **data, OCI_TypeInfo *typinf, unsigned int nbelem)
 
 -- | Bind a Collection variable.
-ociBindColl :: Ptr OCI_Statement -> String -> Ptr OCI_Coll -> IO Bool
-ociBindColl st n d = withCString n (\n' ->
+ociBindColl :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Coll -> IO Bool
+ociBindColl st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindColl($(OCI_Statement *st)
                                              , $(const char *n')
                                              , $(OCI_Coll *d)) } |]
@@ -355,8 +356,8 @@ ociBindColl st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfColls (OCI_Statement *stmt, const otext *name, OCI_Coll **data, OCI_TypeInfo *typinf, unsigned int nbelem)
 
 -- | Bind a Ref variable.
-ociBindRef :: Ptr OCI_Statement -> String -> Ptr OCI_Ref -> IO Bool
-ociBindRef st n d = withCString n (\n' ->
+ociBindRef :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Ref -> IO Bool
+ociBindRef st n d = useAsCString n (\n' ->
         fmap toBool [C.exp| int { OCI_BindRef($(OCI_Statement *st)
                                             , $(const char *n')
                                             , $(OCI_Ref *d)) } |]
@@ -366,14 +367,14 @@ ociBindRef st n d = withCString n (\n' ->
 -- boolean OCI_BindArrayOfRefs (OCI_Statement *stmt, const otext *name, OCI_Ref **data, OCI_TypeInfo *typinf, unsigned int nbelem)
 
 -- | Bind a Statement variable (PL/SQL Ref Cursor)
-ociBindStatement :: Ptr OCI_Statement -> String -> Ptr OCI_Statement -> IO Bool
-ociBindStatement st name d = withCString name (\name' ->
+ociBindStatement :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Statement -> IO Bool
+ociBindStatement st name d = useAsCString name (\name' ->
         fmap toBool [C.exp| int { OCI_BindStatement($(OCI_Statement *st), $(const char *name'), $(OCI_Statement *d)) } |]
     )
 
 -- | Bind a Long variable.
-ociBindLong :: Ptr OCI_Statement -> String -> Ptr OCI_Long -> CUInt -> IO Bool
-ociBindLong st name d s = withCString name (\name' ->
+ociBindLong :: Ptr OCI_Statement -> ByteString -> Ptr OCI_Long -> CUInt -> IO Bool
+ociBindLong st name d s = useAsCString name (\name' ->
         fmap toBool [C.exp| int { OCI_BindLong($(OCI_Statement *st), $(const char *name'), $(OCI_Long *d), $(unsigned int s)) } |]
     )
 
@@ -394,22 +395,22 @@ ociGetBind :: Ptr OCI_Statement -> CUInt -> IO (Maybe (Ptr OCI_Bind))
 ociGetBind st i = fmap toMaybePtr [C.exp| OCI_Bind* { OCI_GetBind($(OCI_Statement *st), $(unsigned int i)) } |]
 
 -- | Return a bind handle from its name.
-ociGetBind2 :: Ptr OCI_Statement -> String -> IO (Maybe (Ptr OCI_Bind))
-ociGetBind2 st name = withCString name (\name' ->
+ociGetBind2 :: Ptr OCI_Statement -> ByteString -> IO (Maybe (Ptr OCI_Bind))
+ociGetBind2 st name = useAsCString name (\name' ->
         fmap toMaybePtr [C.exp| OCI_Bind* { OCI_GetBind2($(OCI_Statement *st), $(char *name')) } |]
     )
 
 -- | Return the index of the bind from its name belonging to the given statement.
-ociGetBindIndex :: Ptr OCI_Statement -> String -> IO CUInt
-ociGetBindIndex st name = withCString name (\name' ->
+ociGetBindIndex :: Ptr OCI_Statement -> ByteString -> IO CUInt
+ociGetBindIndex st name = useAsCString name (\name' ->
         [C.exp| unsigned int { OCI_GetBindIndex($(OCI_Statement *st), $(char* name')) } |]
     )
 
 -- | Return the name of the given bind.
-ociBindGetName :: Ptr OCI_Bind -> IO String
+ociBindGetName :: Ptr OCI_Bind -> IO ByteString
 ociBindGetName b = do
     name <- [C.exp| const char* { OCI_BindGetName($(OCI_Bind *b)) } |]
-    peekCString name
+    packCString name
 
 -- | Set the direction mode of a bind handle.
 ociBindSetDirection :: Ptr OCI_Bind -> BindDirectionMode -> IO Bool

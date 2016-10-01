@@ -46,9 +46,9 @@ module Database.Ocilib.Statement
     , ociStatementGetConnection
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
@@ -71,9 +71,9 @@ ociStatementFree :: Ptr OCI_Statement -> IO Bool
 ociStatementFree s = fmap toBool [C.exp| int { OCI_StatementFree($(OCI_Statement *s)) } |]
 
 -- | Prepare a SQL statement or PL/SQL block.
-ociPrepare :: Ptr OCI_Statement -> String -> IO Bool
+ociPrepare :: Ptr OCI_Statement -> ByteString -> IO Bool
 ociPrepare s sql =
-    withCString sql (\q ->
+    useAsCString sql (\q ->
         fmap toBool [C.exp| int { OCI_Prepare($(OCI_Statement *s), $(char *q)) } |]
     )
 
@@ -82,31 +82,31 @@ ociExecute :: Ptr OCI_Statement -> IO Bool
 ociExecute s = fmap toBool [C.exp| int { OCI_Execute($(OCI_Statement *s)) } |]
 
 -- | Prepare and Execute a SQL statement or PL/SQL block.
-ociExecuteStmt :: Ptr OCI_Statement -> String -> IO Bool
+ociExecuteStmt :: Ptr OCI_Statement -> ByteString -> IO Bool
 ociExecuteStmt s sql =
-    withCString sql (\q ->
+    useAsCString sql (\q ->
         fmap toBool [C.exp| int { OCI_ExecuteStmt($(OCI_Statement *s), $(char *q)) } |]
     )
 
 -- | Parse a SQL statement or PL/SQL block.
-ociParse :: Ptr OCI_Statement -> String -> IO Bool
+ociParse :: Ptr OCI_Statement -> ByteString -> IO Bool
 ociParse st sql =
-    withCString sql (\s ->
+    useAsCString sql (\s ->
         fmap toBool [C.exp| int { OCI_Parse($(OCI_Statement *st), $(char *s)) } |]
     )
 
 -- | Describe the select list of a SQL select statement.
-ociDescribe :: Ptr OCI_Statement -> String -> IO Bool
+ociDescribe :: Ptr OCI_Statement -> ByteString -> IO Bool
 ociDescribe st sql =
-    withCString sql (\s ->
+    useAsCString sql (\s ->
         fmap toBool [C.exp| int {OCI_Describe($(OCI_Statement *st), $(char *s)) } |]
     )
 
 -- | Return the last SQL or PL/SQL statement prepared or executed by the statement.
-ociGetSql :: Ptr OCI_Statement -> IO String
+ociGetSql :: Ptr OCI_Statement -> IO ByteString
 ociGetSql st = do
     r <- [C.exp| const char* { OCI_GetSql($(OCI_Statement *st)) } |] -- FIXME should release the CString
-    peekCString r
+    packCString r
 
 -- | Return the error position (in terms of characters) in the SQL statement where the error occurred in case of SQL parsing error.
 ociGetSqlErrorPos :: Ptr OCI_Statement -> IO CUInt
@@ -121,10 +121,10 @@ ociGetSQLCommand :: Ptr OCI_Statement -> IO CUInt
 ociGetSQLCommand st = [C.exp| unsigned int { OCI_GetSQLCommand($(OCI_Statement *st)) } |]
 
 -- | Return the verb of the SQL command held by the statement handle.
-ociGetSQLVerb :: Ptr OCI_Statement -> IO String
+ociGetSQLVerb :: Ptr OCI_Statement -> IO ByteString
 ociGetSQLVerb st = do
     v <- [C.exp| const char* { OCI_GetSQLVerb($(OCI_Statement *st)) } |]
-    peekCString v
+    packCString v
 
 -- Statement Control
 

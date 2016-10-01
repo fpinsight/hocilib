@@ -13,6 +13,7 @@ module Database.Ocilib.Internal where
 
 import Foreign.Ptr
 
+-- | return Nothing if nullPtr Ptr otherwise
 toMaybePtr :: Ptr a -> Maybe (Ptr a)
 toMaybePtr a
     | a == nullPtr = Nothing

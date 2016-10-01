@@ -23,9 +23,8 @@ module Database.Ocilib.Connection
     , ociBreak
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
--- import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
@@ -42,12 +41,12 @@ C.include "<ocilib.h>"
 type Connection = Ptr OCI_Connection
 
 -- | Create a physical connection to an Oracle database server.
-ociConnectionCreate :: String -> String -> String -> SessionMode -> IO (Maybe Connection)
+ociConnectionCreate :: ByteString -> ByteString -> ByteString -> SessionMode -> IO (Maybe Connection)
 ociConnectionCreate db user pass mode = do
     let m = fromIntegral $ fromEnum mode
-    withCString db ( \d ->
-        withCString user ( \u ->
-            withCString pass ( \p ->
+    useAsCString db ( \d ->
+        useAsCString user ( \u ->
+            useAsCString pass ( \p ->
                 fmap toMaybePtr [C.exp| OCI_Connection* { OCI_ConnectionCreate($(char* d), $(char* u), $(char* p), $(unsigned int m)) } |]
             )
         )

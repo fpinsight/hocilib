@@ -33,9 +33,9 @@ module Database.Ocilib.Pool
     , ociPoolSetStatementCacheSize
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
-import           Foreign.C.String
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
 import qualified Language.C.Inline as C
@@ -52,13 +52,13 @@ C.include "<ocilib.h>"
 type Pool = Ptr OCI_Pool
 
 -- | Create an Oracle pool of connections or sessions.
-ociPoolCreate :: String -> String -> String -> PoolType -> SessionMode -> CUInt -> CUInt -> CUInt -> IO (Maybe Pool)
+ociPoolCreate :: ByteString -> ByteString -> ByteString -> PoolType -> SessionMode -> CUInt -> CUInt -> CUInt -> IO (Maybe Pool)
 ociPoolCreate db user pwd pType mode minCon maxCon incrCon = do
     let pt = fromIntegral $ fromEnum pType
         m  = fromIntegral $ fromEnum mode
-    withCString db (\d ->
-        withCString user (\u ->
-            withCString pwd (\p ->
+    useAsCString db (\d ->
+        useAsCString user (\u ->
+            useAsCString pwd (\p ->
                 fmap toMaybePtr [C.exp| OCI_Pool* { OCI_PoolCreate( $(char *d)
                                                                   , $(char *u)
                                                                   , $(char *p)
@@ -76,9 +76,9 @@ ociPoolFree :: Ptr OCI_Pool -> IO Bool
 ociPoolFree p = fmap toBool [C.exp| int { OCI_PoolFree($(OCI_Pool *p))} |]
 
 -- | Get a connection from the pool.
-ociPoolGetConnection :: Ptr OCI_Pool -> String -> IO (Maybe (Ptr OCI_Connection))
+ociPoolGetConnection :: Ptr OCI_Pool -> ByteString -> IO (Maybe (Ptr OCI_Connection))
 ociPoolGetConnection p tag =
-    withCString tag (\t ->
+    useAsCString tag (\t ->
         fmap toMaybePtr [C.exp| OCI_Connection* { OCI_PoolGetConnection($(OCI_Pool *p), $(char *t)) } |]
     )
 

@@ -1,5 +1,5 @@
 name:               hocilib
-version:            0.1.0
+version:            0.2.0
 license:            BSD3
 license-file:       LICENSE
 category:           Database, Oracle, Ocilib, FFI
@@ -64,9 +64,10 @@ library
   extra-libraries:  ocilib
   extra-lib-dirs:   /usr/local/lib
 
-  build-depends: base             >= 4.8 && < 5
-               , containers       >= 0.5 && < 1
-               , inline-c         >= 0.5 && < 1
+  build-depends: base             >= 4.8  && < 5
+               , bytestring       >= 0.10 && < 0.11
+               , containers       >= 0.5  && < 1
+               , inline-c         >= 0.5  && < 1
                , template-haskell
 
 

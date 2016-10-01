@@ -79,6 +79,7 @@ module Database.Ocilib.Collections
     , ociElemSetNull
     ) where
 
+import           Data.ByteString
 import           Data.Monoid ((<>))
 import           Foreign.C.Types
 import           Foreign.C.String
@@ -230,10 +231,10 @@ ociElemGetBoolean e = fmap toBool [C.exp| int { OCI_ElemGetBoolean($(OCI_Elem *e
 -}
 
 -- | Return the String value of the given collection element.
-ociElemGetString :: Ptr OCI_Elem -> IO String
+ociElemGetString :: Ptr OCI_Elem -> IO ByteString
 ociElemGetString elem = do
     s <- [C.exp| const char* { OCI_ElemGetString($(OCI_Elem *elem)) } |]
-    peekCString s
+    packCString s
 
 {-
 -- | Read the RAW value of the collection element into the given buffer.
@@ -295,9 +296,9 @@ ociElemGetString elem = do
 -}
 
 -- | Set a string value to a collection element.
-ociElemSetString :: Ptr OCI_Elem -> String -> IO Bool
+ociElemSetString :: Ptr OCI_Elem -> ByteString -> IO Bool
 ociElemSetString elem value =
-    withCString value (\value' ->
+    useAsCString value (\value' ->
         fmap toBool [C.exp| int { OCI_ElemSetString($(OCI_Elem *elem), $(char *value')) } |]
     )
 {-
