@@ -27,6 +27,7 @@ library
                   , Database.Ocilib.Bindings
                   , Database.Ocilib.Collections
                   , Database.Ocilib.Connection
+                  , Database.Ocilib.Dcn
                   , Database.Ocilib.Enums
                   , Database.Ocilib.Errors
                   , Database.Ocilib.Fetch
@@ -48,6 +49,7 @@ library
 
   c-sources:        src/Database/Ocilib.c
                   , src/Database/Ocilib/Bindings.c
+                  , src/Database/Ocilib/Dcn.c
                   , src/Database/Ocilib/Errors.c
                   , src/Database/Ocilib/Pool.c
                   , src/Database/Ocilib/Fetch.c
