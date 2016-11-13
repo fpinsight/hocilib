@@ -1,0 +1,9 @@
+version: '2'
+services:
+  oracle:
+    image: alexeiled/docker-oracle-xe-11g:latest
+    ports:
+      - "1521:1521"
+    shm_size: 2g
+    volumes:
+      - ./sql:/etc/entrypoint-initdb.d
