@@ -2,9 +2,9 @@
 set -ex
 
 cd /tmp
-wget https://github.com/vrogier/ocilib/archive/v4.3.0.tar.gz
-tar xvf v4.3.0.tar.gz
-cd /tmp/ocilib-4.3.0
+wget https://github.com/vrogier/ocilib/archive/v4.3.2.tar.gz
+tar xvf v4.3.2.tar.gz
+cd /tmp/ocilib-4.3.2
 
 ./configure --with-oracle-import=linkage \
             --with-oracle-charset=ansi \
@@ -13,6 +13,6 @@ cd /tmp/ocilib-4.3.0
 make
 sudo make install
 cd
-rm -rf /tmp/ocilib-4.3.0
+rm -rf /tmp/ocilib-4.3.2
 echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/usr-local.conf
 sudo ldconfig
