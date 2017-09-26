@@ -27,6 +27,7 @@ library
                   , Database.Ocilib.Bindings
                   , Database.Ocilib.Collections
                   , Database.Ocilib.Connection
+                  , Database.Ocilib.DateTime
                   , Database.Ocilib.Enums
                   , Database.Ocilib.Errors
                   , Database.Ocilib.Fetch
@@ -38,7 +39,6 @@ library
   other-modules:    Database.Ocilib.BitMask
                   , Database.Ocilib.Schemas
                   , Database.Ocilib.Transaction
-                  , Database.Ocilib.DateTime
                   , Database.Ocilib.Timestamp
                   , Database.Ocilib.Internal
 

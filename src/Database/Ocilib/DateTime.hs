@@ -73,8 +73,32 @@ ociDateFree d = fmap toBool [C.exp| int { OCI_DateFree($(OCI_Date *d)) } |]
 -- | Extract the time part from a date handle.
 -- boolean OCI_DateGetTime (OCI_Date *date, int *hour, int *min, int *sec)
 
+-}
+
 -- | Extract the date and time parts from a date handle.
 -- boolean OCI_DateGetDateTime (OCI_Date *date, int *year, int *month, int *day, int *hour, int *min, int *sec)
+ociDateGetDateTime :: Ptr OCI_Date -> IO (Maybe (Int, Int, Int, Int, Int, Int))
+ociDateGetDateTime d = do
+    ((year', month', day', hour', mi', sec'), done) <- C.withPtrs (\(year, month, day, hour, mi, sec) ->
+       [C.exp| int { OCI_DateGetDateTime( $(OCI_Date *d)
+                                        , $(int *year)
+                                        , $(int *month)
+                                        , $(int *day)
+                                        , $(int *hour)
+                                        , $(int *mi)
+                                        , $(int *sec)
+                                        ) } |])
+    if (toBool done) then
+        return $ Just ( fromIntegral year'
+                      , fromIntegral month'
+                      , fromIntegral day'
+                      , fromIntegral hour'
+                      , fromIntegral mi'
+                      , fromIntegral sec'
+                      )
+    else
+        return Nothing
+{-
 
 -- | Set the date portion if the given date handle.
 -- boolean OCI_DateSetDate (OCI_Date *date, int year, int month, int day)
