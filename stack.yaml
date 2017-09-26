@@ -1,4 +1,4 @@
-resolver: lts-7.2
+resolver: lts-9.4
 packages:
 - '.'
 extra-deps: []
@@ -8,4 +8,3 @@ extra-include-dirs: []
 extra-lib-dirs: []
 docker:
   enable: false
-  repo: mystack:latest
